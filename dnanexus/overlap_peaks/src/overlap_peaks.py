@@ -40,6 +40,7 @@ def main(rep1_peaks, rep2_peaks, pooled_peaks, pooledpr1_peaks, pooledpr2_peaks,
         op = OverlapPeaks(rep1_peaks, rep2_peaks, pooled_peaks, pooledpr1_peaks,
                           pooledpr2_peaks, chrom_sizes, as_file, peak_type)
         op.download(DxDownloader)
+        op.process()
         op.upload(DxUploader)
         return op.output(DxLinker)
 
