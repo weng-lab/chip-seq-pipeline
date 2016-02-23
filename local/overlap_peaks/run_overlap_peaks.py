@@ -3,7 +3,7 @@
 import sys, os, shutil
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '../'))
-from local_common import LOCAL_DIR, LocalFile, LocalDownloader, LocalUploader, LocalLinker
+from local_common import LOCAL_DIR, LocalFile, LocalDownloader, LocalUploader, LocalLinker, FilesAndPaths
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '../../'))
 from core.overlap_peaks import OverlapPeaks

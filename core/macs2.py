@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 
-import os, time
+import os, sys, time
 
-sys.path.append(os.path.join(os.path.dirname(__file__), '../../dnanexus'))
+sys.path.append(os.path.join(os.path.dirname(__file__), '../dnanexus'))
 import common
 
 class Macs2PeakCaller(object):
@@ -19,6 +19,8 @@ class Macs2PeakCaller(object):
                 self.narrowPeak_as     = File.init(narrowpeak_as)
                 self.gappedPeak_as     = File.init(gappedpeak_as)
                 self.broadPeak_as      = File.init(broadpeak_as)
+
+                self.genomesize = genomesize
 
         def download(self, downloader):
                 # Download the file inputs to the local file system
@@ -67,7 +69,7 @@ class Macs2PeakCaller(object):
                 command = 'macs2 callpeak ' + \
                                   '-t %s -c %s ' %(self.experiment.name, self.control.name) + \
                                   '-f BED -n %s/%s ' %(peaks_dirname, prefix) + \
-                                  '-g %s -p 1e-2 --nomodel --shift 0 --extsize %s --keep-dup all -B --SPMR' %(genomesize, fraglen)
+                                  '-g %s -p 1e-2 --nomodel --shift 0 --extsize %s --keep-dup all -B --SPMR' %(self.genomesize, fraglen)
                 print command
                 returncode = common.block_on(command)
                 print "MACS2 exited with returncode %d" %(returncode)
@@ -94,7 +96,7 @@ class Macs2PeakCaller(object):
                 command = 'macs2 callpeak ' + \
                                   '-t %s -c %s ' %(self.experiment.name, self.control.name) + \
                                   '-f BED -n %s/%s ' %(peaks_dirname, prefix) + \
-                                  '-g %s -p 1e-2 --broad --nomodel --shift 0 --extsize %s --keep-dup all' %(genomesize, fraglen)
+                                  '-g %s -p 1e-2 --broad --nomodel --shift 0 --extsize %s --keep-dup all' %(self.genomesize, fraglen)
                 print command
                 returncode = common.block_on(command)
                 print "MACS2 exited with returncode %d" %(returncode)
@@ -211,7 +213,7 @@ class Macs2PeakCaller(object):
                 # Generate bigWigs from beds to support trackhub visualization of peak files
                 #============================================
 
-                narrowPeak_bb_fname = common.bed2bb('%s' %(narrowPeak_fn), self.chrom_sizes.name, self.narrowpeak_as.name, bed_type='bed6+4')
+                narrowPeak_bb_fname = common.bed2bb('%s' %(narrowPeak_fn), self.chrom_sizes.name, self.narrowPeak_as.name, bed_type='bed6+4')
                 gappedPeak_bb_fname = common.bed2bb('%s' %(gappedPeak_fn), self.chrom_sizes.name, self.gappedPeak_as.name, bed_type='bed12+3')
                 broadPeak_bb_fname =  common.bed2bb('%s' %(broadPeak_fn),  self.chrom_sizes.name, self.broadPeak_as.name,  bed_type='bed6+3')
 
