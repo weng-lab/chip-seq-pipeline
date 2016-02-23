@@ -2,7 +2,7 @@
 
 import sys, os, shutil
 
-sys.path.append(os.path.join(os.path.dirname(__file__), '../../core/overlap_peaks/src/'))
+sys.path.append(os.path.join(os.path.dirname(__file__), '../../core/overlap_peaks'))
 from overlap_peaks import OverlapPeaks
 
 class LocalDownloader:
