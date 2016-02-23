@@ -8,6 +8,7 @@ import common
 class OverlapPeaks(object):
         def __init__(self, rep1_peaks, rep2_peaks, pooled_peaks, pooledpr1_peaks, pooledpr2_peaks,
                      chrom_sizes, as_file, peak_type):
+
                 self.rep1_peaks = rep1_peaks
                 self.rep2_peaks = rep2_peaks
                 self.pooled_peaks = pooled_peaks
@@ -92,7 +93,7 @@ class OverlapPeaks(object):
                         print "%s is unrecognized.  peak_type should be narrowPeak, gappedPeak or broadPeak."
                         sys.exit()
 
-                # Find pooled peaks that overlap Rep1 and Rep2 where overlap is defined as the fractional overlap wrt any one of the overlapping peak pairs  > 0.5
+                # Find pooled peaks that overlap Rep1 and Rep2 where overlap is defined 1bp
                 out, err = common.run_pipe([
                         'intersectBed -wo -a %s -b %s' %(self.pooled_peaks_fn, self.rep1_peaks_fn),
                         awk_command,
@@ -105,7 +106,7 @@ class OverlapPeaks(object):
                         ], self.overlap_tr_fn)
                 print "%d peaks overlap with both true replicates" %(common.count_lines(self.overlap_tr_fn))
 
-                # Find pooled peaks that overlap PseudoRep1 and PseudoRep2 where overlap is defined as the fractional overlap wrt any one of the overlapping peak pairs  > 0.5
+                # Find pooled peaks that overlap PseudoRep1 and PseudoRep2 where overlap is defined as 1bp
                 out, err = common.run_pipe([
                         'intersectBed -wo -a %s -b %s' %(self.pooled_peaks_fn, self.pooledpr1_peaks_fn),
                         awk_command,
@@ -144,7 +145,7 @@ class OverlapPeaks(object):
 
                 self.overlapping_peaks 		= uploader.upload(common.compress(self.overlapping_peaks_fn))
                 self.overlapping_peaks_bb 	= uploader.upload(self.overlapping_peaks_bb_fn)
-                self.rejected_peaks 			= uploader.upload(common.compress(self.rejected_peaks_fn))
+                self.rejected_peaks 		= uploader.upload(common.compress(self.rejected_peaks_fn))
                 self.rejected_peaks_bb 		= uploader.upload(self.rejected_peaks_bb_fn)
 
         def output(self, linker):

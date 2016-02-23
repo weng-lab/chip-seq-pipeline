@@ -61,6 +61,7 @@ def testOverlap():
     op.upload(LocalUploader)
     output = op.output(LocalLinker)
 
+    print "************************** output"
     for k, v in output.iteritems():
         print k, v
 
