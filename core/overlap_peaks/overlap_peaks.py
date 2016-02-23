@@ -6,30 +6,31 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '../../dnanexus'))
 import common
 
 class OverlapPeaks(object):
-        def __init__(self, rep1_peaks, rep2_peaks, pooled_peaks, pooledpr1_peaks, pooledpr2_peaks,
-                     chrom_sizes, as_file, peak_type):
+        def __init__(self, rep1_peaks, rep2_peaks, pooled_peaks, pooledpr1_peaks,
+                     pooledpr2_peaks, chrom_sizes, as_file, peak_type, File):
 
-                self.rep1_peaks = rep1_peaks
-                self.rep2_peaks = rep2_peaks
-                self.pooled_peaks = pooled_peaks
-                self.pooledpr1_peaks = pooledpr1_peaks
-                self.pooledpr2_peaks = pooledpr2_peaks
-                self.chrom_sizes = chrom_sizes
-                self.as_file = as_file
+                self.rep1_peaks = File.init(rep1_peaks)
+                self.rep2_peaks = File.init(rep2_peaks)
+                self.pooled_peaks = File.init(pooled_peaks)
+                self.pooledpr1_peaks = File.init(pooledpr1_peaks)
+                self.pooledpr2_peaks = File.init(pooledpr2_peaks)
+                self.chrom_sizes = File.init(chrom_sizes)
+                self.as_file = File.init(as_file)
                 self.peak_type = peak_type
 
                 #Input filenames - necessary to define each explicitly because input files could have the same name, in which case subsequent
                 #file would overwrite previous file
-                self.rep1_peaks_fn		= 'rep1-%s' %(rep1_peaks.name)
-                self.rep2_peaks_fn		= 'rep2-%s' %(rep2_peaks.name)
-                self.pooled_peaks_fn 	= 'pooled-%s' %(pooled_peaks.name)
-                self.pooledpr1_peaks_fn	= 'pooledpr1-%s' %(pooledpr1_peaks.name)
-                self.pooledpr2_peaks_fn	= 'pooledpr2-%s' %(pooledpr2_peaks.name)
+                self.rep1_peaks_fn		= 'rep1-%s' %(self.rep1_peaks.name)
+                self.rep2_peaks_fn		= 'rep2-%s' %(self.rep2_peaks.name)
+                self.pooled_peaks_fn 	= 'pooled-%s' %(self.pooled_peaks.name)
+                self.pooledpr1_peaks_fn	= 'pooledpr1-%s' %(self.pooledpr1_peaks.name)
+                self.pooledpr2_peaks_fn	= 'pooledpr2-%s' %(self.pooledpr2_peaks.name)
                 self.chrom_sizes_fn		= 'chrom.sizes'
-                self.as_file_fn			= '%s.as' %(peak_type)
+                self.as_file_fn			= '%s.as' %(self.peak_type)
 
                 # Output filenames
-                m = re.match('(.*)(\.%s)+(\.((gz)|(Z)|(bz)|(bz2)))' %(peak_type), pooled_peaks.name) #strip off the peak and compression extensions
+                m = re.match('(.*)(\.%s)+(\.((gz)|(Z)|(bz)|(bz2)))' %(peak_type),
+                             self.pooled_peaks.name) #strip off the peak and compression extensions
                 if m:
                         basename = m.group(1)
                 else:
