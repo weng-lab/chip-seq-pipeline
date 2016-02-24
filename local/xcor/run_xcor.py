@@ -11,8 +11,8 @@ from core.xcor import Xcor
 def testXcor():
     outFolder = "/home/mjp/dnanexus_refactor_test/scratch/"
     os.chdir(outFolder)
-
-    xcr = Macs2PeakCaller("R2.raw.srt.filt.nodup.srt.SE.tagAlign.gz",
+#The files need to be checked
+    xcr = Xcor("R2.raw.srt.filt.nodup.srt.SE.tagAlign.gz",
                           "C2.raw.srt.filt.nodup.srt.SE.tagAlign.gz",
                           "R2.raw.srt.filt.nodup.srt.filt.nodup.sample.15.SE.tagAlign.gz.cc.qc",
                           FilesAndPaths.mm10_chrom_sizes,
@@ -22,10 +22,10 @@ def testXcor():
                           "hs", #TODO: extract out!
                           LocalFile)
 
-    mpc.download(LocalDownloader)
-    mpc.process()
-    mpc.upload(LocalUploader)
-    output = mpc.output(LocalLinker)
+    xcr.download(LocalDownloader)
+    xcr.process()
+    xcr.upload(LocalUploader)
+    output = xcr.output(LocalLinker)
 
     print "************************** output"
     for k, v in output.iteritems():
