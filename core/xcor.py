@@ -43,9 +43,9 @@ def Xcor(object):
 	# The following line(s) initialize your data object inputs on the platform
 	# into dxpy.DXDataObject instances that you can start using immediately.
 
-	   self.input_bam_file = File.init(input_bam)
+       self.input_bam_file = File.init(input_bam)
        self.input_bam_filename = self.input_bam_file.name
-	   self.input_bam_basename = self.input_bam_file.name.rstrip('.bam')
+       elf.input_bam_basename = self.input_bam_file.name.rstrip('.bam')
            
 	# The following line(s) download your file inputs to the local file system
 	# using variable names for the filenames.
@@ -53,23 +53,23 @@ def Xcor(object):
        downloader.download(self.input_bam_file.get_id(), self.input_bam_filename)
 
     def process(self):
-	   self.intermediate_TA_filename = self.input_bam_basename + ".tagAlign"
-	   if paired_end:
-		  end_infix = 'PE2SE'
-	   else:
-		  end_infix = 'SE'
-	   self.final_TA_filename = self.input_bam_basename + '.' + end_infix + '.tagAlign.gz'
+	self.intermediate_TA_filename = self.input_bam_basename + ".tagAlign"
+	if paired_end:
+	  end_infix = 'PE2SE'
+	else:
+	  end_infix = 'SE'
+	self.final_TA_filename = self.input_bam_basename + '.' + end_infix + '.tagAlign.gz'
 
 	# ===================
 	# Create tagAlign file
 	# ===================
 
-       out,err = run_pipe([
-            "bamToBed -i %s" %(self.input_bam_filename),
-            r"""awk 'BEGIN{OFS="\t"}{$4="N";$5="1000";print $0}'""",
-            "tee %s" %(self.intermediate_TA_filename),
-            "gzip -c"],
-            outfile=self.final_TA_filename)
+        out,err = run_pipe([
+        "bamToBed -i %s" %(self.input_bam_filename),
+        r"""awk 'BEGIN{OFS="\t"}{$4="N";$5="1000";print $0}'""",
+        "tee %s" %(self.intermediate_TA_filename),
+        "gzip -c"],
+        outfile=self.final_TA_filename)
         print subprocess.check_output('ls -l', shell=True)
 
 	# ================
@@ -82,9 +82,9 @@ def Xcor(object):
             self.final_nmsrt_bam_filename = self.final_nmsrt_bam_prefix + ".bam"
             subprocess.check_call(shlex.split("samtools sort -n %s %s" %(self.input_bam_filename, self.final_nmsrt_bam_prefix)))
             out,err = run_pipe([
-                "bamToBed -bedpe -mate1 -i %s" %(self.final_nmsrt_bam_filename),
-                "gzip -c"],
-                outfile=self.final_BEDPE_filename)
+            "bamToBed -bedpe -mate1 -i %s" %(self.final_nmsrt_bam_filename),
+            "gzip -c"],
+            outfile=self.final_BEDPE_filename)
             print subprocess.check_output('ls -l', shell=True)
 
         # =================================
