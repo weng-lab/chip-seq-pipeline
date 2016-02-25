@@ -37,15 +37,16 @@ def run_pipe(steps, outfile=None):
 	out,err = p.communicate()
 	return out,err
 
-def Xcor(object):
-    def __init__(self, input_bam, paired_end):
+class Xcor(object):
+    def __init__(self, input_bam, File, paired_end=False):
             
 	# The following line(s) initialize your data object inputs on the platform
 	# into dxpy.DXDataObject instances that you can start using immediately.
 
        self.input_bam_file = File.init(input_bam)
        self.input_bam_filename = self.input_bam_file.name
-       elf.input_bam_basename = self.input_bam_file.name.rstrip('.bam')
+       self.input_bam_basename = self.input_bam_file.name.rstrip('.bam')
+       self.paired_end=paired_end
            
 	# The following line(s) download your file inputs to the local file system
 	# using variable names for the filenames.
@@ -54,7 +55,7 @@ def Xcor(object):
 
     def process(self):
 	self.intermediate_TA_filename = self.input_bam_basename + ".tagAlign"
-	if paired_end:
+	if self.paired_end:
 	  end_infix = 'PE2SE'
 	else:
 	  end_infix = 'SE'
@@ -75,7 +76,7 @@ def Xcor(object):
 	# ================
 	# Create BEDPE file
 	# ================
-        if paired_end:
+        if slef.paired_end:
             self.final_BEDPE_filename = self.input_bam_basename + ".bedpe.gz"
             #need namesorted bam to make BEDPE
             final_nmsrt_bam_prefix = self.input_bam_basename + ".nmsrt"
@@ -91,7 +92,7 @@ def Xcor(object):
         # Subsample tagAlign file
         # ================================
         NREADS=15000000
-        if paired_end:
+        if self.paired_end:
             end_infix = 'MATE1'
         else:
             end_infix = 'SE'
@@ -99,7 +100,7 @@ def Xcor(object):
         steps = [
             'grep -v "chrM" %s' %(self.intermediate_TA_filename),
             'shuf -n %d' %(NREADS)]
-        if paired_end:
+        if self.paired_end:
             steps.extend([r"""awk 'BEGIN{OFS="\t"}{$4="N";$5="1000";print $0}'"""])
         steps.extend(['gzip -c'])
         out,err = run_pipe(steps,outfile=self.subsampled_TA_filename)
@@ -132,7 +133,7 @@ def Xcor(object):
         # if not paired_end:
         #     final_BEDPE_filename = 'SE_so_no_BEDPE'
         #     subprocess.check_call('touch %s' %(final_BEDPE_filename), shell=True)
-        if paired_end:
+        if self.paired_end:
             self.BEDPE_file = uploader.upload(self.final_BEDPE_filename)
 
         self.CC_scores_file = uploader.upload(self.CC_scores_filename)
@@ -144,11 +145,11 @@ def Xcor(object):
         
         output = {}
         output["tagAlign_file"] = linker.link(self.tagAlign_file)
-        if paired_end:
+        if self.paired_end:
             output["BEDPE_file"] = linker.link(self.BEDPE_file)
         output["CC_scores_file"] = linker.link(self.CC_scores_file)
         output["CC_plot_file"] = linker.link(self.CC_plot_file)
-        output["paired_end"] = paired_end
+        output["paired_end"] = self.paired_end
 
         return output
 

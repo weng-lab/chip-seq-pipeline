@@ -9,18 +9,11 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '../../'))
 from core.xcor import Xcor
 
 def testXcor():
-    outFolder = "/home/mjp/dnanexus_refactor_test/scratch/"
+    outFolder = "/nfs/0_metadata@bib5/dnanexus_refactor_test/output_test/"
     os.chdir(outFolder)
 #The files need to be checked
-    xcr = Xcor("R2.raw.srt.filt.nodup.srt.SE.tagAlign.gz",
-                          "C2.raw.srt.filt.nodup.srt.SE.tagAlign.gz",
-                          "R2.raw.srt.filt.nodup.srt.filt.nodup.sample.15.SE.tagAlign.gz.cc.qc",
-                          FilesAndPaths.mm10_chrom_sizes,
-                          FilesAndPaths.as_narrowPeak,
-                          FilesAndPaths.as_gappedPeak,
-                          FilesAndPaths.as_broadPeak,
-                          "hs", #TODO: extract out!
-                          LocalFile)
+    xcr = Xcor("R1.raw.srt.filt.nodup.srt.bam",
+                LocalFile)
 
     xcr.download(LocalDownloader)
     xcr.process()

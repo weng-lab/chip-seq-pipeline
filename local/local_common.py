@@ -1,6 +1,6 @@
 import os, sys, shutil
 
-LOCAL_DIR = "/home/mjp/dnanexus_refactor_test/histone/macs2"
+LOCAL_DIR = "/nfs/0_metadata@bib5/dnanexus_refactor_test/histone/macs2"
 
 class LocalFile:
     def __init__(self, fn, d = None):
