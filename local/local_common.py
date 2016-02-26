@@ -3,11 +3,8 @@ import os, sys, shutil
 LOCAL_DIR = "/nfs/0_metadata@bib5/dnanexus_refactor_test/histone/macs2"
 
 class LocalFile:
-    def __init__(self, fn, d = None):
-        if d:
-            self.fnp = os.path.join(d, fn)
-        else:
-            self.fnp = os.path.join(LOCAL_DIR, fn)
+    def __init__(self, fn, d = LOCAL_DIR):
+        self.fnp = os.path.join(d, fn)
         self.name = fn
 
     def get_id(self):
