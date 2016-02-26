@@ -39,6 +39,7 @@ class FilesAndPaths:
     # TODO: autodownload?
     d = "/project/umw_zhiping_weng/0_metadata/"
     mm10_chrom_sizes = LocalFile("mm10.chromInfo", os.path.join(d, "genome"))
+    hg19_chrom_sizes = LocalFile("hg19.chromInfo", os.path.join(d, "genome"))
     as_narrowPeak = LocalFile("narrowPeak.as", os.path.join(d, "tools/ucsc.v287/as/"))
     as_gappedPeak = LocalFile("gappedPeak.as", os.path.join(d, "tools/ucsc.v287/as/"))
     as_broadPeak = LocalFile("broadPeak.as", os.path.join(d, "tools/ucsc.v287/as/"))

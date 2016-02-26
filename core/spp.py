@@ -7,12 +7,12 @@ import common
 
 class SPP(object):
 
-	def __init__(self, experiment, control, xcor_scores_input, npeaks, nodups, bigbed, chrom_sizes, as_file=None):
+	def __init__(self, File, experiment, control, xcor_scores_input, chrom_sizes, npeaks=300000, nodups=True, bigbed=False, as_file=None):
 
 		# Initialize required data object inputs
 		self.experiment        = File.init(experiment)
 		self.control           = File.init(control)
-		self.xcor_scores_input = File.init(xcor_scores_input)
+		self.xcor_scores_input = File(xcor_scores_input, "/home/pratth/_tforig")
 		self.chrom_sizes       = File.init(chrom_sizes)
 
 		# Initialize AS file only if bigbed set
@@ -21,7 +21,7 @@ class SPP(object):
 		# Store parameters
 		self.npeaks = npeaks
 		self.nodups = nodups
-		self.bigbed = bidbed
+		self.bigbed = bigbed
 
 	def download(self, downloader):
 
@@ -35,7 +35,9 @@ class SPP(object):
 		downloader.download(self.control.get_id(), self.control.name)
 		downloader.download(self.xcor_scores_input.get_id(), self.xcor_scores_input.name)
 
-	def process(self):
+	def cpu_count(self): return 16
+
+	def process(self, resource_dir):
 
 		# Define output directory
 		peaks_dirname = "peaks_spp"
@@ -54,12 +56,18 @@ class SPP(object):
 		print "Read fragment length: %d" % fragment_length
 
 		# install SPP
-		spp_tarball = '/phantompeakqualtools/spp_1.10.1.tar.gz'
-		run_spp = '/phantompeakqualtools/run_spp_nodups.R' if self.nodups else '/phantompeakqualtools/run_spp.R'
-		print subprocess.check_output(shlex.split('R CMD INSTALL %s' % spp_tarball), stderr=subprocess.STDOUT)
+		ca_tarball  = '%s/caTools/caTools_1.17.1.tar.gz' % resource_dir
+		spp_tarball = '%s/phantompeakqualtools/spp_1.10.1.tar.gz' % resource_dir
+		bitops_tarball = '%s/bitops/bitops_1.0-6.tar.gz' % resource_dir
+		run_spp = '%s/phantompeakqualtools/run_spp_nodups.R' % resource_dir if self.nodups else '%s/phantompeakqualtools/run_spp.R' % resource_dir
+		if not os.path.exists(os.path.expanduser("~/R-libs")): os.mkdir(os.path.expanduser("~/R-libs"))
+		print subprocess.check_output(shlex.split('R CMD INSTALL -l %s %s' % (os.path.expanduser("~/R-libs"), bitops_tarball)), stderr=subprocess.STDOUT)
+		print subprocess.check_output(shlex.split('R CMD INSTALL -l %s %s' % (os.path.expanduser("~/R-libs"), ca_tarball)), stderr=subprocess.STDOUT)
+		print subprocess.check_output(shlex.split('R CMD INSTALL -l %s %s/snow/snow_0.4-1.tar.gz' % (os.path.expanduser("~/R-libs"), resource_dir)), stderr=subprocess.STDOUT)
+		print subprocess.check_output(shlex.split('R CMD INSTALL -l %s %s' % (os.path.expanduser("~/R-libs"), spp_tarball)), stderr=subprocess.STDOUT)
 
 		# run SPP
-		spp_command = "Rscript %s -p=%d -c=%s -i=%s -npeak=%d -speak=%d -savr=%s -savp=%s -rf -out=%s" % (run_spp, cpu_count(), experiment_filename, control_filename, npeaks, fragment_length, peaks_filename, xcor_plot_filename, xcor_scores_filename)
+		spp_command = "Rscript %s -p=%d -c=%s -i=%s -npeak=%d -speak=%d -savr=%s -savp=%s -rf -out=%s" % (run_spp, self.cpu_count(), self.experiment.name, self.control.name, self.npeaks, fragment_length, self.peaks_fn, self.xcor_plot_fn, self.xcor_scores_fn)
 		print spp_command
 		process = subprocess.Popen(shlex.split(spp_command), stderr=subprocess.STDOUT, stdout=subprocess.PIPE)
 		for line in iter(process.stdout.readline, ''):
@@ -75,16 +83,12 @@ class SPP(object):
 
 	def upload(self, uploader):
 
-                # Upload peaks
-		print subprocess.check_output(shlex.split("gzip %s" % self.fixed_peaks_fn))
-		self.peaks = uploader.upload(self.fixed_peaks_fn + ".gz")
-
 		# Information about called peaks
 		n_spp_peaks = common.count_lines(self.peaks_fn)
 		print "%s peaks called by spp" % n_spp_peaks
 		print "%s of those peaks removed due to bad coordinates" % (n_spp_peaks - common.count_lines(self.fixed_peaks_fn))
 		print "First 50 peaks"
-		print subprocess.check_output('head -50 %s' % self.fixed_peaks_fun, shell=True, stderr=subprocess.STDOUT)
+		print subprocess.check_output('head -50 %s' % self.fixed_peaks_fn, shell=True, stderr=subprocess.STDOUT)
 
 		# Upload bigBed if applicable
 		if self.bigbed:
@@ -93,6 +97,10 @@ class SPP(object):
 				self.peaks_bb = uploader.upload(self.peaks_bb_fn)
 
 		if not filecmp.cmp(self.peaks_fn, self.fixed_peaks_fn): print "Returning peaks with fixed coordinates"
+
+		# Upload peaks
+		print subprocess.check_output(shlex.split("gzip %s" % self.fixed_peaks_fn))
+		self.peaks = uploader.upload(self.fixed_peaks_fn + ".gz")
 
 		# Upload cross-correlations
                 self.xcor_plot   = uploader.upload(self.xcor_plot)
