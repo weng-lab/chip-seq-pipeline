@@ -76,7 +76,7 @@ class Xcor(object):
 	# ================
 	# Create BEDPE file
 	# ================
-        if slef.paired_end:
+        if self.paired_end:
             self.final_BEDPE_filename = self.input_bam_basename + ".bedpe.gz"
             #need namesorted bam to make BEDPE
             final_nmsrt_bam_prefix = self.input_bam_basename + ".nmsrt"
@@ -96,7 +96,7 @@ class Xcor(object):
             end_infix = 'MATE1'
         else:
             end_infix = 'SE'
-        subsampled_TA_filename = self.input_bam_basename + ".filt.nodup.sample.%d.%s.tagAlign.gz" %(NREADS/1000000, end_infix)
+        self.subsampled_TA_filename = self.input_bam_basename + ".filt.nodup.sample.%d.%s.tagAlign.gz" %(NREADS/1000000, end_infix)
         steps = [
             'grep -v "chrM" %s' %(self.intermediate_TA_filename),
             'shuf -n %d' %(NREADS)]
@@ -114,8 +114,8 @@ class Xcor(object):
         # Filename <tab> numReads <tab> estFragLen <tab> corr_estFragLen <tab> PhantomPeak <tab> corr_phantomPeak <tab> argmin_corr <tab> min_corr <tab> phantomPeakCoef <tab> relPhantomPeakCoef <tab> QualityTag
 
         #run_spp_command = subprocess.check_output('which run_spp.R', shell=True)
-        spp_tarball = '/phantompeakqualtools/spp_1.10.1.tar.gz'
-        run_spp_command = '/phantompeakqualtools/run_spp_nodups.R'
+        spp_tarball = '../dnanexus/xcor/resources/phantompeakqualtools/spp_1.10.1.tar.gz'
+        run_spp_command = '../dnanexus/xcor/resources/phantompeakqualtools/run_spp_nodups.R'
         #install spp
         print subprocess.check_output(shlex.split('R CMD INSTALL %s' %(spp_tarball)))
         out,err = run_pipe([
