@@ -9,21 +9,21 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '../../'))
 from core.spp import SPP
 
 def testSPP():
-    outFolder = "/home/mjp/dnanexus_refactor_test/scratch/"
+    outFolder = "/home/pratth/_tftest/"
     os.chdir(outFolder)
 
-    spc = SPP("R2.raw.srt.filt.nodup.srt.SE.tagAlign.gz",
+    spc = SPP(LocalFile,
+              "R2.raw.srt.filt.nodup.srt.SE.tagAlign.gz",
               "C2.raw.srt.filt.nodup.srt.SE.tagAlign.gz",
-              "R2.raw.srt.filt.nodup.srt.filt.nodup.sample.15.SE.tagAlign.gz.cc.qc",
-              FilesAndPaths.mm10_chrom_sizes,
-              FilesAndPaths.as_narrowPeak,
-              FilesAndPaths.as_gappedPeak,
-              FilesAndPaths.as_broadPeak,
-              "hs", #TODO: extract out!
-              LocalFile )
+              "R2.raw.srt.filt.nodup.srt.SE.tagAlign.gz.SE.pr2.ccscores",
+              FilesAndPaths.hg19_chrom_sizes,
+              300000,
+              True,
+              True,
+              FilesAndPaths.as_narrowPeak )
 
     spc.download(LocalDownloader)
-    spc.process()
+    spc.process("/home/pratth/weng-lab/chip-seq-pipeline/dnanexus/spp/resources")
     spc.upload(LocalUploader)
     output = spc.output(LocalLinker)
 
