@@ -16,17 +16,33 @@ class LocalFile:
             return LocalFile(fn)
         return fn
 
+	@staticmethod
+	def describe(fn):
+		return {'name' : fn}
+
 class LocalDownloader:
     @staticmethod
-    def download(uri, fn):
-        print uri, fn
-        shutil.copyfile(uri, fn)
+    def download(uri, fn, new_fn=None):
+		if not new_fn:
+	        print uri, fn
+		    shutil.copyfile(uri, fn)
+		else:
+			print uri,new_fn
+			shutil.copy(uri,fn)
+			shutil.move(fn,new_fn)
+			
 
 class LocalUploader:
     @staticmethod
-    def upload(fn):
-        print "not sure how to upload", fn
-        return fn
+    def upload(fn,new_fn=None):
+		if not new_fn:
+			print "not sure how to upload", fn
+			return fn
+		else:
+			print "1. not sure how to upload", fn
+			print "2. not sure how to upload:", new_fn
+			return fn
+			
 
 class LocalLinker:
     @staticmethod
