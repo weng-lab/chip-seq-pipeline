@@ -53,7 +53,7 @@ class Xcor(object):
     def download(self, downloader):
        downloader.download(self.input_bam_file.get_id(), self.input_bam_filename)
 
-    def process(self):
+    def process(self, working_dir):
 	self.intermediate_TA_filename = self.input_bam_basename + ".tagAlign"
 	if self.paired_end:
 	  end_infix = 'PE2SE'
@@ -81,7 +81,8 @@ class Xcor(object):
             #need namesorted bam to make BEDPE
             final_nmsrt_bam_prefix = self.input_bam_basename + ".nmsrt"
             self.final_nmsrt_bam_filename = self.final_nmsrt_bam_prefix + ".bam"
-            subprocess.check_call(shlex.split("samtools sort -n %s %s" %(self.input_bam_filename, self.final_nmsrt_bam_prefix)))
+            subprocess.check_call(shlex.split("samtools sort -n %s %s" \
+								%(self.input_bam_filename, self.final_nmsrt_bam_prefix)))
             out,err = run_pipe([
             "bamToBed -bedpe -mate1 -i %s" %(self.final_nmsrt_bam_filename),
             "gzip -c"],
@@ -113,9 +114,17 @@ class Xcor(object):
         # CC_SCORE FILE format
         # Filename <tab> numReads <tab> estFragLen <tab> corr_estFragLen <tab> PhantomPeak <tab> corr_phantomPeak <tab> argmin_corr <tab> min_corr <tab> phantomPeakCoef <tab> relPhantomPeakCoef <tab> QualityTag
 
+        ca_tarball  = '%s../dnanexus/xcor/resources/caTools_1.17.1.tar.gz' % working_dir
+        print subprocess.check_output(shlex.split('R CMD INSTALL %s' %(ca_tarball)))
+
+        bitops_tarball = '%s../dnanexus/xcor/resources/bitops_1.0-6.tar.gz' % working_dir
+        print subprocess.check_output(shlex.split('R CMD INSTALL %s' %(bitops_tarball)))
+        snow_tarball  = '%s../dnanexus/xcor/resources/snow_0.4-1.tar.gz' % working_dir
+        print subprocess.check_output(shlex.split('R CMD INSTALL %s' %(snow_tarball)))
+
         #run_spp_command = subprocess.check_output('which run_spp.R', shell=True)
-        spp_tarball = '../dnanexus/xcor/resources/phantompeakqualtools/spp_1.10.1.tar.gz'
-        run_spp_command = '../dnanexus/xcor/resources/phantompeakqualtools/run_spp_nodups.R'
+        spp_tarball = '%s../dnanexus/xcor/resources/phantompeakqualtools/spp_1.10.1.tar.gz' % (working_dir)
+        run_spp_command = '%s../dnanexus/xcor/resources/phantompeakqualtools/run_spp_nodups.R' %(working_dir)
         #install spp
         print subprocess.check_output(shlex.split('R CMD INSTALL %s' %(spp_tarball)))
         out,err = run_pipe([

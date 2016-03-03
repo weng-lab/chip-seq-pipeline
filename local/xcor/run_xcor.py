@@ -8,24 +8,26 @@ from local_common import LOCAL_DIR, LocalFile, LocalDownloader, LocalUploader, L
 sys.path.append(os.path.join(os.path.dirname(__file__), '../../'))
 from core.xcor import Xcor
 
-def testXcor():
-    outFolder = "/nfs/0_metadata@bib5/dnanexus_refactor_test/output_test/"
-    os.chdir(outFolder)
-#The files need to be checked
-    xcr = Xcor("R1.raw.srt.filt.nodup.srt.bam",
-                LocalFile)
+def testXcor(working_dir):
+	outFolder = "/nfs/0_metadata@bib5/dnanexus_refactor_test/output_test/"
+	os.chdir(outFolder)
 
-    xcr.download(LocalDownloader)
-    xcr.process()
-    xcr.upload(LocalUploader)
-    output = xcr.output(LocalLinker)
+	#The files need to be checked
+	xcr = Xcor("R1.raw.srt.filt.nodup.srt.bam",LocalFile)
+	xcr.download(LocalDownloader)
+	xcr.process(working_dir)
+	xcr.upload(LocalUploader)
+	output = xcr.output(LocalLinker)
 
-    print "************************** output"
-    for k, v in output.iteritems():
-        print k, v
+	print "************************** output"
+
+	for k, v in output.iteritems():
+		print k, v
 
 def main():
-    print testXcor()
+	working_dir=os.path.join(os.path.dirname(os.path.realpath(__file__)), '../')
+	print working_dir
+	print testXcor(working_dir)
 
 if __name__ == '__main__':
-    sys.exit(main())
+	sys.exit(main())
