@@ -24,7 +24,7 @@ def run_pipe(steps, outfile=None):
             print "first step shlex to stdout: %s" %(shlex.split(step))
             p = Popen(shlex.split(step), stdout=PIPE)
             #need to close p.stdout here?
-        elif n == last_step_n and outfile: #only treat the last step specially if you're sending stdout to a file
+        elif n == last_step_n and outfile: #only treat the last step specially if you're sending std
             with open(outfile, 'w') as fh:
                 print "last step shlex: %s to file: %s" %(shlex.split(step), outfile)
                 p_last = Popen(shlex.split(step), stdin=p.stdout, stdout=fh)
@@ -67,7 +67,7 @@ class Bwa(object):
 			#bwa = "bwa0.7.7"
 		print "Using bwa version %s" %(self.bwa_version)
                 return None
-        
+
         def process(self, File, downloader, uploader, linker):
 		# Generate filename strings and download the files to the local filesystem
 		reads_filename = File.describe(self.reads_file)['name']
@@ -100,7 +100,7 @@ class Bwa(object):
 			bwa_command = "%s aln %s -t %d %s %s" \
 				%(self.bwa, self.bwa_aln_params, cpu_count(), reference_filename, reads_filename)
 			print bwa_command
-			subprocess.check_call(shlex.split(bwa_command), stdout=sai_file) 
+			subprocess.check_call(shlex.split(bwa_command), stdout=sai_file)
 
 		print subprocess.check_output('ls -l', shell=True)
 
@@ -141,9 +141,9 @@ class Bwa(object):
 		unmapped_reads_filenames = []
 		for i,reads in enumerate(fn_input['indexed_reads']):
 			read_pair_number = i+1
-                        
+
 			tmp_reads=fn_input['LocalFile'](reads,"./")
-                        
+
 			fn = fn_input['LocalFile'].describe(tmp_reads)['name']
 			print "indexed_reads %d: %s" %(read_pair_number, fn)
 			indexed_reads_filenames.append(fn)

@@ -40,7 +40,7 @@ def main():
         if 'samtools_version' in input_JSON:
             samtools_version = input_JSON['samtools_version']
     '''
-    reads1="R1.raw.srt.bam"
+    reads1="R1.fq.gz"
     reads2=None
     reference_tar = "male.mm10.tar.gz"
     bwa_aln_params = "-q 5 -l 32 -k 2 "
@@ -63,7 +63,7 @@ def main():
 
     paired_end = reads2 is not None
     unmapped_reads = [r for r in [reads1, reads2] if r]
-   
+
     subjobs = []
     for reads in unmapped_reads:
         subjob_input = {"reads_file": reads,
@@ -76,7 +76,7 @@ def main():
         bwa = Bwa(subjob_input)
         subjobs.append(bwa.process(LocalFile, LocalDownloader, LocalUploader, LocalLinker))
     # Create the job that will perform the "postprocess" step.  depends_on=subjobs, so blocks on all subjobs
-    
+
     fn_input={ "indexed_reads": [subjob['output'] for subjob in subjobs],
                "unmapped_reads": unmapped_reads,
                "reference_tar": reference_tar,
@@ -86,7 +86,7 @@ def main():
                 "LocalDownloader" : LocalDownloader,
                 "LocalUploader" : LocalUploader,
                 "LocalLinker" : LocalLinker}
-    bwa.postprocess(fn_input)          
+    bwa.postprocess(fn_input)
     mapped_reads = ("mapped_reads")
     mapping_statistics = ("mapping_statistics")
 
@@ -98,6 +98,6 @@ def main():
     output.update({'output_JSON': output.copy()})
 
     print "Exiting with output: %s" %(output)
- 
+
 if __name__ == '__main__':
     sys.exit(main())
