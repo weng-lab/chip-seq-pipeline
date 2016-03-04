@@ -1,0 +1,106 @@
+#!/usr/bin/env python
+
+import sys, os, shutil
+
+sys.path.append(os.path.join(os.path.dirname(__file__), '../'))
+from local_common import LOCAL_DIR, LocalFile, LocalDownloader, LocalUploader, LocalLinker, FilesAndPaths
+
+sys.path.append(os.path.join(os.path.dirname(__file__), '../../'))
+from core.bwar import Bwa
+
+
+def main():
+#def main(reads1=None, reference_tar=None, bwa_aln_params=None, bwa_version=None, samtools_version=None, \
+#        reads2=None, input_JSON=None, debug=False):
+    
+#    logger = logging.getLogger(__name__)
+    # Main entry-point.  Parameter defaults assumed to come from dxapp.json.
+    # reads1, reference_tar, reads2 are links to DNAnexus files or None
+    
+#    if debug:
+#        logger.setLevel(logging.DEBUG)
+#    else:
+#       logger.setLevel(logging.INFO)
+    # if there is input_JSON, it over-rides any explicit parameters
+    outFolder = "/nfs/0_metadata@bib5/dnanexus_refactor_test/output_test/bwa/"
+    os.chdir(outFolder)
+    
+'''    
+    if input_JSON:
+        if 'reads1' in input_JSON:
+            reads1 = input_JSON['reads1']
+        if 'reads2' in input_JSON:
+            reads2 = input_JSON['reads2']
+        if 'reference_tar' in input_JSON:
+            reference_tar = input_JSON['reference_tar']
+        if 'bwa_aln_params' in input_JSON:
+            bwa_aln_params = input_JSON['bwa_aln_params']
+        if 'bwa_version' in input_JSON:
+            bwa_version = input_JSON['bwa_version']
+        if 'samtools_version' in input_JSON:
+            samtools_version = input_JSON['samtools_version']
+'''
+    reads1=LocalFile.init("R1.raw.srt.bam")
+    reads2=None
+    reference_tar = LocalFile.init("male.mm10.tar.gz")
+    bwa_aln_params = "-q 5 -l 32 -k 2 -t "
+    bwa_version = 1000
+    samtools_version = 1000
+    
+    
+    if not reads1:
+        #logger.error('reads1 is required, explicitly or in input_JSON')
+        raise Exception
+
+    # This spawns only one or two subjobs for single- or paired-end,
+    # respectively.  It could also download the files, chunk the reads,
+    # and spawn multiple subjobs.
+
+    # Files are downloaded later by subjobs into their own filesystems
+    # and uploaded to the project.
+
+    # Initialize file handlers for input files.
+
+    paired_end = reads2 is not None
+    unmapped_reads = [r for r in [reads1, reads2] if r]
+    bwa = Bwa(reads1,reference_tar, bwa_aln_params, bwa_version, \
+                LocalFile, LocalDownloader, LocalUploader, LocalLinkerR)
+
+#    subjobs = []
+#    for reads in unmapped_reads:
+#        subjob_input = {"reads_file": reads,
+#                        "reference_tar": reference_tar,
+#                        "bwa_aln_params": bwa_aln_params,
+#                        "bwa_version": bwa_version}
+#        print "Submitting:"
+#        print subjob_input
+#        subjobs.append(dxpy.new_dxjob(subjob_input, "process"))
+
+    # Create the job that will perform the "postprocess" step.  depends_on=subjobs, so blocks on all subjobs
+    print " End Of Process "
+    sys.exit(0)
+'''
+    postprocess_job = dxpy.new_dxjob(fn_input={ "indexed_reads": [subjob.get_output_ref("output") for subjob in subjobs],
+                                                "unmapped_reads": unmapped_reads,
+                                                "reference_tar": reference_tar,
+                                                "bwa_version": bwa_version,
+                                                "samtools_version": samtools_version },
+                                     fn_name="postprocess",
+                                     depends_on=subjobs)
+
+    mapped_reads = postprocess_job.get_output_ref("mapped_reads")
+    mapping_statistics = postprocess_job.get_output_ref("mapping_statistics")
+
+    output = {
+        "mapped_reads": mapped_reads,
+        "mapping_statistics": mapping_statistics,
+        "paired_end": paired_end
+    }
+    output.update({'output_JSON': output.copy()})
+
+    print "Exiting with output: %s" %(output)
+    return output
+'''
+if __name__ == '__main__':
+    sys.exit(main())
+
