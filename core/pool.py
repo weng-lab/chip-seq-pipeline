@@ -15,7 +15,6 @@ import os, subprocess, shlex, time, re, gzip
 from os.path import splitext
 from multiprocessing import Pool, cpu_count
 from subprocess import Popen, PIPE #debug only this should only need to be imported into run_pipe
-import dxpy
 
 def run_pipe(steps, outfile=None):
     #break this out into a recursive function
@@ -50,10 +49,11 @@ def run_pipe(steps, outfile=None):
     out,err = p.communicate()
     return out,err
 
-class pooler(object):
-    @static_method
-    def process(self,inputs,File,downloader,uploader,linker):
-        self.input_filenames = []
+class Pooler(object):
+    @staticmethod
+    def process(inputs, File, downloader, uploader, linker):
+        input_filenames = []
+        print "INIZIO"
         for input_file in inputs:
             dxf = File.init(input_file)
             input_filenames.append(dxf.name)
